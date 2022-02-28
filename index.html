@@ -1,0 +1,44 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vanilla Boilerplate</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
+</head>
+
+<body>
+  <div class="container m-4">
+    <button class="border border-emerald-400 rounded-md p-1" id="btn-login">Metamask Login</button>
+    <button class="border border-emerald-400 rounded-md p-1" id="btn-logout">Logout</button>
+  </div>
+  <div>
+    <div class="container m-4 bg-slate-900 text-white p-2">
+      <h2>Mint A New NFT</h2>
+      <div>
+        <div class="my-5">
+          <input type="file" id="nftUpload_input" />
+          <button class="border px-2 hover:border-emerald-400" id="btn-upload">Upload to IFPS</button>
+          | New NFT location
+          <input type="text" id="ifps_imageUri_input" class="text-black" size="70" placeholder="IFPS image uri" />
+          | <button class="border px-2 hover:border-emerald-400" id="btn-create-metadata">Generate NFT MetaData</button>
+        </div>
+        <input type="text" size="20" id="nftName_input" class="text-black" placeholder="NFT name" />
+        <input type="text" size="40" id="nftDescription_input" class="text-black" placeholder="NFT description" />
+        <input type="text" size="70" id="nftMetadata_input" class="text-black" placeholder="NFT Metadata JSON file" />
+        <input type="number" id="nftAmount_input" class="text-black" placeholder="NFT Amount" value="1" />
+        <button class="border px-2 hover:border-emerald-400" id="btn-mint">Mint NFT</button>
+        <div>New NFT:</div>
+        <div id="newNFT_result"></div>
+      </div>
+    </div>
+    <div class="grid grid-cols-4 gap-4 px-4" id="nft-grid"></div>
+  </div>
+  <script type="text/javascript" src="./abi.js"></script>
+  <script type="text/javascript" src="./main.js"></script>
+</body>
+
+</html>
