@@ -1,20 +1,14 @@
-/** initialize Moralis **/
-
-const appId = 'uD11B70DM1UpBrttjUlBYvT5hT7XTubENIeTh6Va';
-const serverUrl = 'https://dnvgtjv4bhii.usemoralis.com:2053/server';
-// const CONTRACT_ADDRESS = '0xa251ca7533dbd00886e64381d7d672246e25dcd5'; // single from NFT Manager demo
-const CONTRACT_ADDRESS = '0x99175bafa4e95744016ee45944f216d2dc5330bb'; // dynamic Opensea_NFT_ERC1155
+const appId = window.appId;
+const serverUrl = window.serverUrl;
+const CONTRACT_ADDRESS = window.contract_address;
 const SAMPLE_NFT_URI = 'https://ipfs.moralis.io:2053/ipfs/QmQjF27mYRuYDZ46nmAv5e4pK37mjNCbZKbc24jzjdkXZp';
 const SAMPLE_NFT_METADATA = 'https://ipfs.moralis.io:2053/ipfs/QmeRPHnUvsiPvRK95o8UUE6ejieeqvsd8aRa2nyYEHyG8s';
-const OWNER_ADDRESS = '0x692a7366D87EC86dcDde62a1484c396d9d979e0F';
 Moralis.start({ serverUrl, appId });
-// Moralis.initialize(application_id);
-// Moralis.serverURL = 'server_url';
-//0x692a7366D87EC86dcDde62a1484c396d9d979e0F
 
 const web3 = new Web3(window.ethereum);
 
 let mainDom;
+let currentUser;
 /** Login user, authenticate with MetaMask */
 async function login() {
   let user = Moralis.User.current();
@@ -27,8 +21,7 @@ async function login() {
       console.log(error)
     }
   } else {
-    const currentUser = user.get('ethAddress');
-    console.log(user)
+    currentUser = user.get('ethAddress');
     console.log('already signed in to address ' + currentUser)
   }
 }
@@ -59,19 +52,23 @@ async function renderNFT(nft) {
   const { image, description, name } = tokenMetaData;
   const col = document.createElement('div');
   col.className = 'col';
-  const displayHtml = `<div class="border rounded-md p-2">
-    <img src="${image}">
-    <div>
-      <h3><strong>${name}</strong></h3>
-      <p>${description}</p>
-      <p>Contract Address: ${tokenAddDisplay}</p>
-      <p>TokenId: ${tokenId}</p>
-      <a href="https://testnets.opensea.io/assets/${tokenAddress}/${tokenId}" 
-        class="border border-gray-500 px-2 rounded-md hover:border-emerald-400" 
-        role="button"
-      >To Opensea</a>
-    </div>
-  </div>`;
+
+  const displayHtml = `<div
+      class="w-full min-h-80 border border-gray-300 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75">
+        <img src="${image}" class="w-full h-full object-center object-cover">
+      </div>
+      <div class="mt-4 flex">
+        <div>
+          <h3 class="text-md text-gray-700">${name}</h3>
+          <p class="mt-1 text-sm text-gray-500">${description}</p>
+          <p class="text-sm text-gray-500">Contract Address: ${tokenAddDisplay}</p>
+          <p class="text-sm text-gray-500">TokenId: ${tokenId}</p>
+          <p class="text-sm mt-2">
+          <a href="https://testnets.opensea.io/assets/${tokenAddress}/${tokenId}" 
+            class="hover:text-emerald-400" 
+            role="button">To Opensea >> </a></p>
+        </div>
+      </div>`
   col.innerHTML = displayHtml;
   mainDom.appendChild(col);
 }
@@ -142,7 +139,7 @@ async function mintFinalToken(_uri, _amount) {
 
   const transactionParameters = {
     to: CONTRACT_ADDRESS,
-    from: OWNER_ADDRESS,
+    from: currentUser,
     data: encodedFunction
   };
   const txt = await ethereum.request({
