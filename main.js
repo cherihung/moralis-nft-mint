@@ -1,8 +1,13 @@
 const appId = window.appId;
 const serverUrl = window.serverUrl;
-const CONTRACT_ADDRESS = window.contract_address;
-const SAMPLE_NFT_URI = 'https://ipfs.moralis.io:2053/ipfs/QmQjF27mYRuYDZ46nmAv5e4pK37mjNCbZKbc24jzjdkXZp';
-const SAMPLE_NFT_METADATA = 'https://ipfs.moralis.io:2053/ipfs/QmeRPHnUvsiPvRK95o8UUE6ejieeqvsd8aRa2nyYEHyG8s';
+const windowParam = new URLSearchParams(document.location.search)
+const CONTRACT_ADDRESS = windowParam.get('contract') || window.contract_address;
+
+// const SAMPLE_NFT_URI = 'https://ipfs.moralis.io:2053/ipfs/QmQjF27mYRuYDZ46nmAv5e4pK37mjNCbZKbc24jzjdkXZp';
+// const SAMPLE_NFT_METADATA = 'https://ipfs.moralis.io:2053/ipfs/QmeRPHnUvsiPvRK95o8UUE6ejieeqvsd8aRa2nyYEHyG8s';
+const SAMPLE_NFT_URI = null;
+const SAMPLE_NFT_METADATA = null;
+
 Moralis.start({ serverUrl, appId });
 
 const web3 = new Web3(window.ethereum);
@@ -22,7 +27,9 @@ async function login() {
     }
   } else {
     currentUser = user.get('ethAddress');
-    console.log('already signed in to address ' + currentUser)
+    document.getElementById('wallet-id').innerText = 'Using Wallet: ' + truncateAddress(currentUser);
+    document.getElementById('btn-login').setAttribute('disabled', 'true');
+    document.getElementById('current-contract-address').innerText = CONTRACT_ADDRESS;
   }
 }
 
@@ -45,16 +52,23 @@ async function getAllNFTs() {
 
 /** render each NFT **/
 async function renderNFT(nft) {
-  const tokenId = nft.token_id;
+  const tokenId = truncateAddress(nft.token_id);
   const tokenAddress = nft.token_address;
-  const tokenAddDisplay = `${tokenAddress.slice(0, 7)}......${tokenAddress.slice(-7)}`
-  const tokenMetaData = JSON.parse(nft.metadata);
+  const tokenAddDisplay = truncateAddress(tokenAddress);
+  let tokenMetaData = JSON.parse(nft.metadata);
+  // backup fetch from token_uri directly if backlog problem still exist on polygon
+  // https://forum.moralis.io/t/metadata-returning-null/4343/8
+  if (!tokenMetaData) {
+    const _metaData = await fetch(nft.token_uri);
+    tokenMetaData = await _metaData.json()
+  }
+
   const { image, description, name } = tokenMetaData;
   const col = document.createElement('div');
   col.className = 'col';
 
   const displayHtml = `<div
-      class="w-full min-h-80 border border-gray-300 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75">
+      class="border border-gray-300 rounded-md overflow-hidden group-hover:opacity-75" style="width:250px;height:250px">
         <img src="${image}" class="w-full h-full object-center object-cover">
       </div>
       <div class="mt-4 flex">
@@ -81,10 +95,11 @@ async function upload() {
     alert("no file chosen");
     return;
   }
+  console.log('uploading....')
   const file = new Moralis.File(data.name, data);
   await file.saveIPFS();
   const imageURI = file.ipfs();
-  console.log(imageURI, file.hash())
+  console.log('sucess:uploaded', file.hash())
   setNewNFTLocation(imageURI);
 }
 
@@ -102,10 +117,11 @@ async function generateTokenMeta() {
     description,
     image: imageUri
   }
+  console.log('generating...')
   const metadataFile = new Moralis.File(`metadata.json`, { base64: btoa(JSON.stringify(metadata)) });
   await metadataFile.saveIPFS();
   const metadataURI = metadataFile.ipfs();
-  console.log(metadataURI)
+  console.log('success: generated:', metadataURI)
   setNewNFTMetadataJsonLocation(metadataURI);
 }
 
@@ -119,8 +135,9 @@ async function mint() {
   }
   const amount = parseInt(_amount);
   console.log('minting...', metadataURI);
-  const txt = await mintFinalToken(metadataURI, amount).then(notifySuccess);
-  console.log('Successfully minted', txt);
+  const txt = await mintFinalToken(metadataURI, amount);
+  notifySuccess(txt);
+  console.log('success:minted', txt);
 }
 
 /** mint token on the eth chain **/
@@ -146,6 +163,7 @@ async function mintFinalToken(_uri, _amount) {
     method: 'eth_sendTransaction',
     params: [transactionParameters]
   });
+  console.log('has minted', txt)
   return txt;
 }
 
@@ -161,11 +179,16 @@ function setNewNFTMetadataJsonLocation(newVal) {
   document.getElementById('nftMetadata_input').value = newVal;
 }
 
+function truncateAddress(add) {
+  return `${add.slice(0, 7)}......${add.slice(-7)}`
+}
+
 // initialize app
 (async function init() {
   mainDom = document.getElementById('nft-grid');
   await login();
   await getAllNFTs();
+  // for testing purpose
   SAMPLE_NFT_URI && setNewNFTLocation(SAMPLE_NFT_URI);
   SAMPLE_NFT_METADATA && setNewNFTMetadataJsonLocation(SAMPLE_NFT_METADATA);
 })()

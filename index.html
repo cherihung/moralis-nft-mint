@@ -16,8 +16,9 @@
           <h1 class="text-3xl font-bold text-black">NFT Dashboard</h1>
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <button type="button"
-                class="border text-white bg-emerald-400 font-medium border-transparent hover:bg-emerald-800 rounded-md py-1 px-2"
+              <span id="wallet-id"></span>
+              <button type="button" class="border text-white bg-emerald-400 font-medium border-transparent 
+                hover:bg-emerald-800 disabled:opacity-50 disabled:bg-emerald-400 rounded-md py-1 px-2"
                 id="btn-login">Metamask
                 Login</button>
               <button type="button"
@@ -37,6 +38,8 @@
             <div class="col-span-2 pt-2">
               <div>
                 <div class="px-4 py-5 bg-white space-y-6">
+                  <div class="block text-sm font-medium text-gray-700">Contract Address: <span
+                      id="current-contract-address"></span></div>
                   <!-- step 1 -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700">1. Upload to IFPS</label>
@@ -95,9 +98,7 @@
             </div>
 
           </div>
-          <div class="container grid grid-cols-4 gap-y-10 gap-x-6">
-            <div class="group relative" id="nft-grid"></div>
-          </div>
+          <div class="container grid grid-cols-4 gap-y-10 gap-x-6" id="nft-grid"></div>
         </div>
     </main>
   </div>

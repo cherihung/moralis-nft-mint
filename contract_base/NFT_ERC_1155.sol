@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NFT_ERC1155_Opensea is ERC1155, Ownable {
-    mapping(uint256 => string) private _uriIdMap; //We create the mapping for TokenID -> URI
+    mapping(uint256 => string) private _uriIdMap; // create the mapping for TokenID -> URI
 
     constructor() ERC1155("dynamic_upon_minting") {}
 
@@ -29,7 +29,7 @@ contract NFT_ERC1155_Opensea is ERC1155, Ownable {
         return newItemId;
     }
 
-    //We override the uri function of the EIP-1155: Multi Token Standard (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol)
+    //override the uri function of the EIP-1155: Multi Token Standard (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol)
     function uri(uint256 tokenId) public view override returns (string memory) {
         return _uriIdMap[tokenId];
     }
