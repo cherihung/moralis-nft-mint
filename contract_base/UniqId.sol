@@ -2,7 +2,7 @@
 pragma solidity ^0.8.7;
 
 // Creating a contract
-contract hashId {
+contract HashId {
     mapping(uint256 => string) private _uriIdMap;
 
     function hash(string memory _uri) public returns (uint256) {

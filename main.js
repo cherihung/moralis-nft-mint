@@ -16,7 +16,7 @@ let mainDom;
 let currentUser;
 /** Login user, authenticate with MetaMask */
 async function login() {
-  let user = Moralis.User.current();
+  let user = await Moralis.User.current();
   if (!user) {
     try {
       user = await Moralis.authenticate({ signingMessage: "Hello You!" })
