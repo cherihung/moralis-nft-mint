@@ -53,6 +53,7 @@ async function getAllNFTs() {
 /** render each NFT **/
 async function renderNFT(nft) {
   const tokenId = truncateAddress(nft.token_id);
+  const tokenForBtn = nft.token_id.slice(0, 6);
   const tokenAddress = nft.token_address;
   const tokenAddDisplay = truncateAddress(tokenAddress);
   let tokenMetaData = JSON.parse(nft.metadata);
@@ -73,25 +74,40 @@ async function renderNFT(nft) {
       </div>
       <div class="mt-4 flex">
         <div>
-          <h3 class="text-md text-gray-700">${name}</h3>
-          <p class="mt-1 text-sm text-gray-500">${description}</p>
-          <p class="text-sm text-gray-500">Contract Address: ${tokenAddDisplay}</p>
-          <p class="text-sm text-gray-500">TokenId: ${tokenId}</p>
+          <h3 class="text-md text-gray-800 font-semibold">${name}</h3>
+          <p class="mt-1 text-sm text-gray-700">${description}</p>
+          <p class="text-sm text-gray-700">Contract Address: ${tokenAddDisplay}</p>
+          <p class="text-sm text-gray-700">TokenId: ${tokenId}</p>
           <p class="text-sm mt-2">
           <a href="https://testnets.opensea.io/assets/${tokenAddress}/${tokenId}" 
-            class="hover:text-emerald-400" 
-            role="button">To Opensea >> </a></p>
+            class="text-blue-600 hover:text-blue-400" 
+            role="button">Opensea >> </a></p>
+          <p class="mt-2 text-sm">
+            <button 
+              class="btn-resync text-gray-400 hover:text-blue-400" 
+              data-id="${nft.token_id}" id="btn-${tokenForBtn}" 
+              type="button">Resync
+            Metadata</button>
+          </p>
         </div>
       </div>`
   col.innerHTML = displayHtml;
   mainDom.appendChild(col);
+  document.getElementById(`btn-${tokenForBtn}`).onclick = resyncMetadata;
 }
 
-async function test() {
-  return new Promise((res) => setTimeout(() => {
-    res(true)
-  }, 5000))
+/** resync metadata **/
+async function resyncMetadata(event) {
+  const tokenId = event.currentTarget.getAttribute('data-id')
+  const options = {
+    address: CONTRACT_ADDRESS,
+    token_id: tokenId,
+    flag: "metadata",
+  };
+  const metadata = await Moralis.Web3API.token.reSyncMetadata(options);
+  console.log('resynced: ', metadata);
 }
+
 /** upload NFT to IFPS  **/
 async function upload() {
   const fileInput = document.getElementById("nftUpload_input");
