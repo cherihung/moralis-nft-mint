@@ -87,6 +87,11 @@ async function renderNFT(nft) {
   mainDom.appendChild(col);
 }
 
+async function test() {
+  return new Promise((res) => setTimeout(() => {
+    res(true)
+  }, 5000))
+}
 /** upload NFT to IFPS  **/
 async function upload() {
   const fileInput = document.getElementById("nftUpload_input");
@@ -96,8 +101,10 @@ async function upload() {
     return;
   }
   console.log('uploading....')
+  addLoadingState();
   const file = new Moralis.File(data.name, data);
   await file.saveIPFS();
+  removeLoadingState();
   const imageURI = file.ipfs();
   console.log('sucess:uploaded', file.hash())
   setNewNFTLocation(imageURI);
@@ -118,8 +125,10 @@ async function generateTokenMeta() {
     image: imageUri
   }
   console.log('generating...')
+  addLoadingState();
   const metadataFile = new Moralis.File(`metadata.json`, { base64: btoa(JSON.stringify(metadata)) });
   await metadataFile.saveIPFS();
+  removeLoadingState();
   const metadataURI = metadataFile.ipfs();
   console.log('success: generated:', metadataURI)
   setNewNFTMetadataJsonLocation(metadataURI);
@@ -135,7 +144,9 @@ async function mint() {
   }
   const amount = parseInt(_amount);
   console.log('minting...', metadataURI);
+  addLoadingState();
   const txt = await mintFinalToken(metadataURI, amount);
+  removeLoadingState();
   notifySuccess(txt);
   console.log('success:minted', txt);
 }
@@ -181,6 +192,14 @@ function setNewNFTMetadataJsonLocation(newVal) {
 
 function truncateAddress(add) {
   return `${add.slice(0, 7)}......${add.slice(-7)}`
+}
+
+function addLoadingState() {
+  document.getElementById('form-container').classList.add('opacity-25');
+}
+
+function removeLoadingState() {
+  document.getElementById('form-container').classList.remove('opacity-25');
 }
 
 // initialize app
