@@ -1,3 +1,4 @@
+const Alpine = window.Alpine;
 const appId = window.appId;
 const serverUrl = window.serverUrl;
 const windowParam = new URLSearchParams(document.location.search)
@@ -12,30 +13,33 @@ Moralis.start({ serverUrl, appId });
 
 const web3 = new Web3(window.ethereum);
 
-let mainDom;
-let currentUser;
+let mainDom, contractDom, walletDom, loginBtnDom;
+
+const currentState = Alpine.reactive({
+  userAddr: undefined,
+  contract: CONTRACT_ADDRESS
+})
+
 /** Login user, authenticate with MetaMask */
 async function login() {
   let user = await Moralis.User.current();
   if (!user) {
     try {
-      user = await Moralis.authenticate({ signingMessage: "Hello You!" })
-      console.log(user)
-      console.log(user.get('ethAddress'))
+      user = await Moralis.authenticate({ signingMessage: "Welcome you!" });
+      currentState.userAddr = user.get('ethAddress');
     } catch (error) {
       console.log(error)
     }
   } else {
-    currentUser = user.get('ethAddress');
-    document.getElementById('wallet-id').innerText = 'Using Wallet: ' + truncateAddress(currentUser);
-    document.getElementById('btn-login').setAttribute('disabled', 'true');
-    document.getElementById('current-contract-address').innerText = CONTRACT_ADDRESS;
+    currentState.userAddr = user.get('ethAddress');
+    console.log('already logged in')
   }
 }
 
 /** Logout user **/
 async function logOut() {
   await Moralis.User.logOut();
+  currentState.userAddr = undefined;
   console.log("logged out");
 }
 
@@ -231,6 +235,17 @@ function removeLoadingState() {
 // initialize app
 (async function init() {
   mainDom = document.getElementById('nft-grid');
+  contractDom = document.getElementById('current-contract-address');
+  walletDom = document.getElementById('wallet-id');
+  loginBtnDom = document.getElementById('btn-login');
+
+  Alpine.effect(() => {
+    walletDom.innerText = currentState.userAddr ? 'Using Wallet: ' + truncateAddress(currentState.userAddr) : '';
+    currentState.userAddr && loginBtnDom.setAttribute('disabled', true);
+    !currentState.userAddr && loginBtnDom.removeAttribute('disabled');
+    contractDom.innerText = currentState.contract;
+  })
+
   await login();
   await getAllNFTs();
   // for testing purpose
