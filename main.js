@@ -60,8 +60,17 @@ async function renderNFT(nft) {
   // backup fetch from token_uri directly if backlog problem still exist on polygon
   // https://forum.moralis.io/t/metadata-returning-null/4343/8
   if (!tokenMetaData) {
-    const _metaData = await fetch(nft.token_uri);
-    tokenMetaData = await _metaData.json()
+    try {
+      const _metaData = await fetch(nft.token_uri);
+      tokenMetaData = await _metaData.json()
+    } catch (err) {
+      console.log('cannot get metadata from uri');
+      tokenMetaData = {
+        image: "https://dummyimage.com/100x100/000/fff&text=fake",
+        name: 'oops',
+        description: 'oops oops'
+      }
+    }
   }
 
   const { image, description, name } = tokenMetaData;
