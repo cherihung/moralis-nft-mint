@@ -4,8 +4,8 @@ const serverUrl = window.serverUrl;
 const windowParam = new URLSearchParams(document.location.search)
 const CONTRACT_ADDRESS = windowParam.get('contract') || window.contract_address;
 
-// const SAMPLE_NFT_URI = 'https://ipfs.moralis.io:2053/ipfs/QmQjF27mYRuYDZ46nmAv5e4pK37mjNCbZKbc24jzjdkXZp';
-// const SAMPLE_NFT_METADATA = 'https://ipfs.moralis.io:2053/ipfs/QmeRPHnUvsiPvRK95o8UUE6ejieeqvsd8aRa2nyYEHyG8s';
+//const SAMPLE_NFT_URI = 'https://ipfs.moralis.io:2053/ipfs/QmVmj2jb4EFRMRycBeVfwL4e4FPQE2DiVc9VRN5khrWrFh';
+//const SAMPLE_NFT_METADATA = 'https://ipfs.moralis.io:2053/ipfs/QmUCSzLUBWV5FPr1qkNpzscABM5qWvDZQZ1goba1dAvquX';
 const SAMPLE_NFT_URI = null;
 const SAMPLE_NFT_METADATA = null;
 
@@ -197,7 +197,7 @@ async function mintFinalToken(_uri, _amount) {
 
   const transactionParameters = {
     to: CONTRACT_ADDRESS,
-    from: currentUser,
+    from: currentState.userAddr,
     data: encodedFunction
   };
   const txt = await ethereum.request({
