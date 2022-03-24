@@ -105,6 +105,7 @@ async function resyncMetadata(event) {
     flag: "metadata",
   };
   const metadata = await Moralis.Web3API.token.reSyncMetadata(options);
+
   console.log('resynced: ', metadata);
 }
 
