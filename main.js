@@ -92,7 +92,7 @@ async function renderNFT(nft) {
           <p class="text-sm text-gray-700">Contract Address: ${tokenAddDisplay}</p>
           <p class="text-sm text-gray-700">TokenId: ${tokenId}</p>
           <p class="text-sm mt-2">
-          <a href="https://testnets.opensea.io/assets/${tokenAddress}/${tokenId}" 
+          <a href="https://testnets.opensea.io/assets/${tokenAddress}/${nft.token_id}" 
             class="text-blue-600 hover:text-blue-400" 
             role="button">Opensea >> </a></p>
           <p class="mt-2 text-sm">
